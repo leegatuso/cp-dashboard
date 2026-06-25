@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.company.cpdashboard.auth.mapper.AuthMapper">
+
+    <!-- 사번 기준으로 내부 USER_ID를 조회한다. -->
+    <select id="getUserId" parameterType="string" resultType="string">
+        SELECT F.USER_ID
+        FROM IS_PE01 P
+                 JOIN FND_USER F ON F.EMPLOYEE_ID = P.HR_PERSON_ID
+        WHERE F.USER_NAME = 'PS' || #{empcd}
+    </select>
+
+    <!-- 로그인 후 화면에 필요한 사용자 표시 정보와 권한값을 함께 조회한다. -->
+    <select id="getLoginUser"
+            parameterType="com.company.cpdashboard.auth.dto.AuthUserLookup"
+            resultType="com.company.cpdashboard.common.session.LoginUser">
+        SELECT A.EMP_ID AS empId,
+               A.EMPCD AS empcd,
+               A.HNAME AS hname,
+               A.DEPTCD AS deptcd,
+               A.DEPTCD_DISP AS deptcdDisp,
+               A.JIKCKCD_DISP AS jikckcdDisp,
+               A.JIKGUBCD_DISP AS jikgubcdDisp,
+               A.WORK_AREA AS workArea,
+               U.ORG_ID AS orgId,
+               U.USER_ID AS userId,
+               NVL(C.STORAGE_AREA, '') AS mngArea,
+               C.SUP_ID AS supId,
+               NVL(C.AUTHORITY, '99') AS authority
+        FROM IS_PE01_V A
+                 JOIN IS_USER_INFO_V U ON A.HR_PERSON_ID = U.EMPLOYEE_ID
+                 LEFT JOIN (SELECT *
+                            FROM IS_SAF_DANGER_MNG
+                            WHERE USE_YN = 'Y') C ON A.EMP_ID = C.EMP_ID
+        WHERE 1 = 1
+        <if test="userId != null and userId != ''">
+            AND U.USER_ID = #{userId}
+        </if>
+        <if test="empcd != null and empcd != ''">
+            AND A.EMPCD = #{empcd}
+        </if>
+    </select>
+
+</mapper>

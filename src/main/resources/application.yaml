@@ -3,16 +3,21 @@ spring:
     name: cp-dashboard
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
-    url: ${CP_DASHBOARD_DB_URL:jdbc:oracle:thin:@localhost:1521/XEPDB1}
-    username: ${CP_DASHBOARD_DB_USERNAME:cp_dashboard}
-    password: ${CP_DASHBOARD_DB_PASSWORD:cp_dashboard}
+    url: ${CP_DASHBOARD_DB_URL:jdbc:oracle:thin:@devdb.poscoplantec.co.kr:1532/DEV1}
+    username: ${CP_DASHBOARD_DB_USERNAME:apps}
+    password: ${CP_DASHBOARD_DB_PASSWORD:apps}
     hikari:
       initialization-fail-timeout: -1
 
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml
+  type-aliases-package: com.company.cpdashboard
   configuration:
     map-underscore-to-camel-case: true
+
+cp-dashboard:
+  session:
+    user-attribute-name: loginUser
 
 management:
   endpoints:
